@@ -8,6 +8,7 @@ import Data.Derive.Internal.Derivation
 import Data.Derive.Arbitrary           as D
 import Data.Derive.ArbitraryOld        as D
 import Data.Derive.Arities             as D
+import Data.Derive.AzPlay              as D
 import Data.Derive.Binary              as D
 import Data.Derive.BinaryDefer         as D
 import Data.Derive.Bounded             as D
@@ -41,5 +42,5 @@ import Data.Derive.UniplateDirect      as D
 import Data.Derive.UniplateTypeable    as D
 import Data.Derive.Update              as D
 derivations :: [Derivation]
-derivations = [makeArbitrary,makeArbitraryOld,makeArities,makeBinary,makeBinaryDefer,makeBounded,makeData,makeDataAbstract,makeDefault,makeEnum,makeEnumCyclic,makeEq,makeFold,makeFoldable,makeFrom,makeFunctor,makeHas,makeIs,makeJSON,makeLazySet,makeLens,makeMonoid,makeNFData,makeOrd,makeRead,makeRef,makeSerial,makeSerialize,makeSet,makeShow,makeTraversable,makeTypeable,makeUniplateDirect,makeUniplateTypeable,makeUpdate]
+derivations = [makeArbitrary,makeArbitraryOld,makeArities,makeAzPlay,makeBinary,makeBinaryDefer,makeBounded,makeData,makeDataAbstract,makeDefault,makeEnum,makeEnumCyclic,makeEq,makeFold,makeFoldable,makeFrom,makeFunctor,makeHas,makeIs,makeJSON,makeLazySet,makeLens,makeMonoid,makeNFData,makeOrd,makeRead,makeRef,makeSerial,makeSerialize,makeSet,makeShow,makeTraversable,makeTypeable,makeUniplateDirect,makeUniplateTypeable,makeUpdate]
 -- GENERATED STOP

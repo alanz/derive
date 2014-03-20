@@ -63,6 +63,7 @@ library
         Data.Derive.Arbitrary
         Data.Derive.ArbitraryOld
         Data.Derive.Arities
+        Data.Derive.AzPlay
         Data.Derive.Binary
         Data.Derive.BinaryDefer
         Data.Derive.Bounded

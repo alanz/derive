@@ -31,4 +31,9 @@ data State s a = StateT (s -> (s, a))
 data TwoParam a b = TwoParam b
 
 data AAA = BBB
+
+data XXX = YYY
+
+data MType = TyInt | TyTup MType MType
+
 -}
