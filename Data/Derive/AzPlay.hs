@@ -6,8 +6,8 @@ import Prelude
 test :: MType
 
 type PFMType =
-      U                        -- TyInt
-  :+: I Type :*: I Type :*:U   -- TyTup
+      U                          -- TyInt
+  :+: I MType :*: I MType :*:U   -- TyTup
 
 -}
 
@@ -25,34 +25,28 @@ makeAzPlay  = derivationCustom "AzPlay" $
 -- DataDecl SrcLoc DataOrNew Context Name [TyVarBind] [QualConDecl] [Deriving]
 makeUpdateField :: DataDecl -> [Decl]
 makeUpdateField d@(DataDecl _ don ctx n _binds qual _ds) =
-        [TypeDecl sl (Ident $ "PF" ++ n) [] typ
-        ,TypeDecl sl (Ident $ "PF" ++ n) [] types
+        [-- TypeDecl sl (Ident $ "PF" ++ n1) [] typ
+         TypeDecl sl (Ident $ "PF" ++ n1) [] types
 
-        -- , TypeSig sl [name upd] (TyParen (TyFun typF typF) `TyFun` typR)
-        -- ,bind upd [pVar "f",pVar "x"] $ RecUpdate (var "x") [FieldUpdate (qname field) (App (var "f") (Paren $ App (var field) (var "x")))]
-
-        -- ,TypeSig sl [name set] (typF `TyFun` typR)
-        -- ,bind set [pVar "v",pVar "x"] $ RecUpdate (var "x") [FieldUpdate (qname field) (var "v")]
         ]
     where
-        -- set = field ++ "_s"
-        -- upd = field ++ "_u"
         typR = dataDeclType d `TyFun` dataDeclType d
         -- typF = fromBangType $ fromJust $ lookup field $ concatMap ctorDeclFields $ dataDeclCtors d
 
         -- n = "[" ++ (concatMap bshow binds) ++ "]"
         -- n = "[" ++ (showOut qual) ++ "]"
-        n = "[" ++ (concatMap doqcd qual) ++ "]"
+        -- n1 = "[" ++ (concatMap doqcd qual) ++ "]"
+        (Ident n1) = n
         -- binds = []
 
         typ = TyVar (Ident "bar")
 
         doqcd (QualConDecl _ binds ctx condecl) = "(QualConDecl " ++ cdshow condecl ++ ")"
 
-        types = foldl jf (TyVar (Ident "foo")) qual
+        types = case qual of
+          [] -> TyVar (Ident "oops, should not happen")
+          xs -> combineQCD $ map toTyCon xs
 
-        jf :: Type -> QualConDecl -> Type
-        jf = undefined
 
 showOut x = unlines $ map prettyPrint x
 
@@ -63,7 +57,28 @@ cdshow (RecDecl n d) = "(RecDecl " ++ show n ++ show d ++ ")"
 bshow (KindedVar n k) = "KindedVar " ++ show n
 bshow (UnkindedVar n) = "UnkindedVar " ++ show n
 
+combineQCD [x] = x
+combineQCD (x:y:xs) = combineQCD ((TyInfix x (UnQual (Symbol ":+:")) y):xs)
+
+toTyCon :: QualConDecl -> Type
+toTyCon (QualConDecl _sl _vbs _ctx (ConDecl n bts)) =
+  case bts of
+    [] -> (TyCon (UnQual (Ident "U")))
+    _ -> combineTC $ map toMRConstructor bts
+
+combineTC [x] = ((TyInfix x (UnQual (Symbol ":*:")) (TyCon (UnQual (Ident "U")))))
+-- combineTC (x:y:xs) = combineTC ((TyInfix x (UnQual (Symbol ":*:")) y):xs)
+combineTC (x:y:xs) = (TyInfix x (UnQual (Symbol ":*:")) (combineTC (y:xs)))
+
+toMRConstructor (UnBangedTy t) = TyApp (TyCon (UnQual (Ident "I"))) t
+toMRConstructor ff = (TyCon (UnQual (Ident (show ff))))
+
 {-
+
+Starting  from
+
+data MType = TyInt | TyTup MType MType
+
 -- Got
 
 type PF[
@@ -72,6 +87,8 @@ type PF[
                                     UnBangedTy (TyCon (UnQual (Ident "MType")))]))]
      = bar
 
+So : QualConDecl:ConDecl are combined with :+:
+     Each list of constructors is combined with :*:
 
 -- Expecting
 for
